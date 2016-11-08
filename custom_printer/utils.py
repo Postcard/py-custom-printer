@@ -38,3 +38,19 @@ def to_base_256(number):
     nL = number % 256
     nH = (number - nL) / 256
     return nH, nL
+
+
+def byte_to_bits(b):
+
+    assert b <= 255
+
+    r = b
+
+    bits = {}
+
+    for i in range(0, 8):
+        a = math.pow(2, 7 - i)
+        bits[7 - i] = int(r // a)
+        r = r % a
+
+    return bits

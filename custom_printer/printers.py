@@ -1,8 +1,9 @@
 from functools import wraps
 
 import usb.core
+import usb.util
 
-from .utils import to_hex
+from .utils import to_hex, byte_to_bits
 
 
 def send_command_to_device(func):
@@ -20,7 +21,6 @@ class CustomPrinter(object):
 
         id_vendor = 0x0dd4
         self.device = usb.core.find(idVendor=id_vendor, idProduct=id_product)
-        self.out_ep = 0x02
 
         if self.device is None:
             raise ValueError("Printer not found. Make sure the cable is plugged in.")
@@ -31,19 +31,47 @@ class CustomPrinter(object):
             except usb.core.USBError as e:
                 print("Could not detatch kernel driver: %s" % str(e))
 
+        self.device.set_configuration()
+
+        configuration = self.device.get_active_configuration()
+        interface = configuration[(0, 0)]
+
+        def out_endpoint_match(ep):
+            return usb.util.endpoint_direction(ep.bEndpointAddress) == usb.util.ENDPOINT_OUT
+
+        self.out_endpoint = usb.util.find_descriptor(interface, custom_match=out_endpoint_match)
+
+        def in_endpoint_match(ep):
+            return usb.util.endpoint_direction(ep.bEndpointAddress) == usb.util.ENDPOINT_IN
+
+        self.in_endpoint = usb.util.find_descriptor(interface, custom_match=in_endpoint_match)
+
     def write_bytes(self, byte_array):
         msg = to_hex(byte_array)
         self.write(msg)
 
     def write(self, msg):
-        self.device.write(self.out_ep, msg,  timeout=20000)
+        self.out_endpoint.write(msg, timeout=20000)
+
+    def read(self):
+        try:
+            return self.in_endpoint.read(self.in_endpoint.wMaxPacketSize)
+        except usb.core.USBError as e:
+            print(e)
+            return None
+
+    def flush_read(self):
+        while True:
+            data = self.read()
+            if not data:
+                break
 
 
-class VKP80(CustomPrinter):
+class VKP80III(CustomPrinter):
 
     def __init__(self):
         id_product = 0x0205
-        super(VKP80, self).__init__(id_product)
+        super(VKP80III, self).__init__(id_product)
 
     @send_command_to_device
     def print_and_feed_paper(self):
@@ -175,5 +203,34 @@ class VKP80(CustomPrinter):
     def initialize(self):
         return [27, 64]
 
+    @send_command_to_device
+    def transmit_real_time_status(self, n):
+        """ Transmits the selected printer status specified by n in real time according to the following parameters:
+        :param n:
+        n= 1 transmit printer status
+        n= 2 transmit off-line status
+        n= 3 transmit error status
+        n= 4 transmit paper roll sensor status
+        n = 17 transmit print status
+        n = 20 transmit FULL STATUS
+        :return:
+        """
+        return [16, 4, n]
 
+    def is_online(self):
+        self.transmit_real_time_status(1)
+        data = self.read()
+        bits = byte_to_bits(data[0])
+        return bits[3] == 0
 
+    def paper_present(self):
+        self.transmit_real_time_status(4)
+        data = self.read()
+        bits = byte_to_bits(data[0])
+        return bits[5] == 0
+
+    def near_paper_end(self):
+        self.transmit_real_time_status(4)
+        data = self.read()
+        bits = byte_to_bits(data[0])
+        return bits[2] == 1
