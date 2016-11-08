@@ -31,3 +31,10 @@ def image_to_pos(im):
         byte_array.append(bit)
 
     return byte_array
+
+
+def to_base_256(number):
+    """ returns the base 256 representation of the number """
+    nL = number % 256
+    nH = (number - nL) / 256
+    return nH, nL
