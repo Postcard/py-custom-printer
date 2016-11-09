@@ -154,7 +154,7 @@ class VKP80III(CustomPrinter):
         return [28, 80, a, b, c, d]
 
     @send_command_to_device
-    def download_bit_image(self, x, y, data):
+    def define_downloaded_bit_image(self, x, y, data):
         """
         Defines a downloaded bit image using the number of dots specified by x and y
         :param x: specifies the number of dots in the horizontal direction
@@ -234,3 +234,12 @@ class VKP80III(CustomPrinter):
         data = self.read()
         bits = byte_to_bits(data[0])
         return bits[2] == 1
+
+    @send_command_to_device
+    def set_left_margin(self, nL, nH):
+        """
+        Set the left margin.
+        The left margin is set to [(nL + nH * 256) * horizontal motion unit]
+        :return:
+        """
+        return [29, 76, nL, nH]

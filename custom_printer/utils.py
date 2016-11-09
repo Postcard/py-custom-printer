@@ -6,8 +6,8 @@ def to_hex(arr):
     return ''.join(chr(b) for b in arr)
 
 
-def image_to_pos(im):
-    """ convert an image to a raster bit array """
+def image_to_raster(im):
+    """ convert an image to a raster bit array used in the print raster command"""
 
     (w, h) = im.size
 
@@ -30,6 +30,38 @@ def image_to_pos(im):
                 bit += int(math.pow(2, 7-j))
         byte_array.append(bit)
 
+    return byte_array
+
+
+def image_to_bit_image(im):
+    """ convert an image to a bit array used in the download bit image command """
+
+    (w, h) = im.size
+
+    assert w == 608, 'Image width must be 608px'
+    assert h == 160, 'Image height must be 160px'
+
+    if im.mode != '1':
+        im = im.convert('1')
+
+    pixels = list(im.getdata())
+
+    nb_lines = h / 8
+    nb_columns = w
+    byte_array = []
+
+    assert nb_columns * nb_lines * 8 == len(pixels)
+
+    for i in range(0, nb_columns):
+        for j in range(0, nb_lines):
+            bit = 0
+            for k in range(0, 8):
+                offset = (j * 8 + k) * w + i
+                v = pixels[offset]
+                if v == 0:
+                    # black pixel
+                    bit += int(math.pow(2, 7-k))
+            byte_array.append(bit)
     return byte_array
 
 
