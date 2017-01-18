@@ -11,7 +11,7 @@ def image_to_raster(im):
 
     (w, h) = im.size
 
-    assert w == 608, 'Image width must be 608px'
+    #assert w == 608, 'Image width must be 608px'
 
     if im.mode != '1':
         im = im.convert('1')

@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 from functools import wraps
 
 import usb.core
@@ -243,3 +245,73 @@ class VKP80III(CustomPrinter):
         :return:
         """
         return [29, 76, nL, nH]
+
+    @send_command_to_device
+    def enable_mass_storage(self, m):
+        """
+        Enable or disable the mass storage function in RAM according to m value
+        :param m: m=0 enable mass storage m=1 disable mass storage
+        :return:
+        """
+        return [28, 110, m]
+
+    def manage_true_type_font(self, m, n, font_name=None):
+        """
+        Manage the TrueType fonts depending on the following values of m
+        :param m:
+        :param n:
+        :param data:
+        :return:
+        """
+        byte_array = [28, 102, m, n]
+        msg = to_hex(byte_array)
+        self.write(msg)
+        if font_name:
+            self.write(font_name)
+
+    @send_command_to_device
+    def set_character_font(self, n):
+        """
+        Selects characters font depending of cpi value set (Char/Inch)
+        :param n:
+        :return:
+        """
+        return [27, 77, n]
+
+    @send_command_to_device
+    def select_character_size(self, n):
+        """
+        Select character size
+        Selects character height and width, as follows:
+        :param n: 0 <= n <= 255
+        • Bits 0 to 3: to select character height
+        • Bits 4 to 7: to select character width
+        :return:
+        """
+        return [29, 33, n]
+
+
+    @send_command_to_device
+    def select_international_character_set(self, n):
+        """
+        :param n:
+        n=0 USA
+        n=1 France
+        n=2 Germany
+        n=3 United Kingdom
+        n=4 Denmark I
+        n=5 Sweden
+        n=6 Italy
+        n=7 Spain I
+        n=8 Japan
+        n=9 Norway
+        n=10 Denmark II
+        :return:
+        """
+        return [27, 82, n]
+
+
+    def select_character_code_table(self, n):
+        return [27, 116, n]
+
+
