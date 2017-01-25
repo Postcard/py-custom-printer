@@ -31,8 +31,6 @@ class CustomPrinter(object):
             except usb.core.USBError as e:
                 print("Could not detatch kernel driver: %s" % str(e))
 
-        self.device.set_configuration()
-
         configuration = self.device.get_active_configuration()
         interface = configuration[(0, 0)]
 
