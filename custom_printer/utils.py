@@ -1,5 +1,7 @@
 import math
 
+import numpy as np
+
 
 def to_hex(arr):
     """ convert a decimal array to an hexadecimal String"""
@@ -9,28 +11,17 @@ def to_hex(arr):
 def image_to_raster(im):
     """ convert an image to a raster bit array used in the print raster command"""
 
-    (w, h) = im.size
-
-    #assert w == 608, 'Image width must be 608px'
-
     if im.mode != '1':
         im = im.convert('1')
 
     pixels = list(im.getdata())
 
-    nb_bits = len(pixels) / 8
-    byte_array = []
-    for i in range(0, nb_bits):
-        bit = 0
-        for j in range(0, 8):
-            offset = i * 8 + j
-            v = pixels[offset]
-            if v == 0:
-                # black pixel
-                bit += int(math.pow(2, 7-j))
-        byte_array.append(bit)
+    return pixels_to_raster(pixels)
 
-    return byte_array
+
+def pixels_to_raster(pixels):
+
+    return list(np.invert(np.packbits(pixels)))
 
 
 def image_to_bit_image(im):
@@ -38,13 +29,17 @@ def image_to_bit_image(im):
 
     (w, h) = im.size
 
-    assert w == 608, 'Image width must be 608px'
     assert h == 160, 'Image height must be 160px'
 
     if im.mode != '1':
         im = im.convert('1')
 
     pixels = list(im.getdata())
+
+    return pixels_to_bit_image(pixels, w, h)
+
+
+def pixels_to_bit_image(pixels, w, h):
 
     nb_lines = h / 8
     nb_columns = w
