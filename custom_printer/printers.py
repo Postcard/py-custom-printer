@@ -49,7 +49,7 @@ class CustomPrinter(object):
         self.write(msg)
 
     def write(self, msg):
-        self.out_endpoint.write(msg, timeout=20000)
+        self.out_endpoint.write(msg, timeout=5000)
 
     def read(self):
         try:
@@ -222,6 +222,7 @@ class VKP80III(CustomPrinter):
         return bits[3] == 0
 
     def paper_present(self):
+        self.flush_read()
         self.transmit_real_time_status(4)
         data = self.read()
         bits = byte_to_bits(data[0])
