@@ -53,9 +53,8 @@ class CustomPrinter(object):
 
     def read(self):
         try:
-            return self.in_endpoint.read(self.in_endpoint.wMaxPacketSize)
-        except usb.core.USBError as e:
-            print(e)
+            return self.in_endpoint.read(self.in_endpoint.wMaxPacketSize, timeout=50)
+        except usb.core.USBError:
             return None
 
     def flush_read(self):
@@ -229,6 +228,7 @@ class VKP80III(CustomPrinter):
         return bits[5] == 0
 
     def near_paper_end(self):
+        self.flush_read()
         self.transmit_real_time_status(4)
         data = self.read()
         bits = byte_to_bits(data[0])
