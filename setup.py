@@ -66,7 +66,8 @@ setup(
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
       'pyusb>=1.0.0',
-      'Pillow>=3.1.0'
+      'Pillow>=3.1.0',
+      'numpy>=1.8.2'
     ]
 
 )
