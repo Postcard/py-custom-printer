@@ -13,7 +13,10 @@ def image_to_raster(im):
 
     if im.mode != '1':
         im = im.convert('1')
-    pixels = np.asarray(im, dtype=int)
+    # convert back to L mode due to strange PIL error
+    # http://stackoverflow.com/questions/2761645/error-converting-pil-bw-images-to-numpy-arrays
+    im = im.convert('L')
+    pixels = np.array(im, dtype=int)
     pixels.flatten()
     return pixels_to_raster(pixels)
 
