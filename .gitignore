@@ -1,2 +1,5 @@
 .idea
 *.pyc
+virtualenv
+.pytest_cache
+__pycache__

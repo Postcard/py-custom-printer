@@ -15,6 +15,6 @@ class TestUtils:
         im = Image.open('./test_ticket.png')
         raster = image_to_raster(im)
         with open('raster.data', 'rb') as f:
-            expected = f.read().split(',')
+            expected = f.read().decode('utf8').split(',')
         expected = [int(b) for b in expected]
         assert raster == expected

@@ -5,7 +5,7 @@ import numpy as np
 
 def to_hex(arr):
     """ convert a decimal array to an hexadecimal String"""
-    return ''.join(chr(b) for b in arr)
+    return ''.join(chr(int(b)) for b in arr)
 
 
 def image_to_raster(im):
