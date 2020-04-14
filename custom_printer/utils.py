@@ -5,7 +5,7 @@ import numpy as np
 
 def to_hex(arr):
     """ convert a decimal array to an hexadecimal String"""
-    hex_cmd = bytes("", "hex")
+    hex_cmd = bytes("", "utf8")
     for x in range(0, len(arr)) :
         hex_cmd += struct.pack('B', arr[x])
     return hex_cmd
