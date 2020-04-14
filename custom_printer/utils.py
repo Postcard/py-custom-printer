@@ -1,14 +1,10 @@
 import math
-import struct
 import numpy as np
 
 
 def to_hex(arr):
     """ convert a decimal array to an hexadecimal String"""
-    hex_cmd = bytes("", "utf8")
-    for x in range(0, len(arr)) :
-        hex_cmd += struct.pack('B', arr[x])
-    return hex_cmd
+    return ''.join(chr(b) for b in arr)
 
 
 def image_to_raster(im):
@@ -69,8 +65,8 @@ def pixels_to_bit_image(pixels, w, h):
 
 def to_base_256(number):
     """ returns the base 256 representation of the number """
-    nL = number % 256
-    nH = (number - nL) / 256
+    nL = int(number % 256)
+    nH = int((number - nL) / 256)
     return nH, nL
 
 
