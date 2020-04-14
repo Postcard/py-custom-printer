@@ -1,10 +1,14 @@
 import math
 import numpy as np
-
+import struct
 
 def to_hex(arr):
     """ convert a decimal array to an hexadecimal String"""
-    return ''.join(chr(b) for b in arr)
+    hstr = bytes("", "utf8")
+    
+    for x in range(0, len(arr)):
+        hstr += struct.pack('B', arr[x])
+    return hstr
 
 
 def image_to_raster(im):
